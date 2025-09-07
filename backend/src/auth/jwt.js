@@ -11,7 +11,8 @@ require("dotenv").config();
 const generateToken = (payload) => {
   // Sign the token with the payload and the secret key from the .env file
   // The token will expire in 1 hour ('1h')
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+  const secret = process.env.JWT_SECRET || "default_jwt_secret_for_development_ayurvedic_herbs_2024";
+  return jwt.sign(payload, secret, { expiresIn: "1h" });
 };
 
 /**
@@ -22,7 +23,8 @@ const generateToken = (payload) => {
 const verifyToken = (token) => {
   try {
     // Verify the token using the same secret key
-    return jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || "default_jwt_secret_for_development_ayurvedic_herbs_2024";
+    return jwt.verify(token, secret);
   } catch (error) {
     // If verification fails (e.g., token is invalid or expired), return null
     console.error("Invalid token:", error.message);

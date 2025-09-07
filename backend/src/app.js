@@ -5,6 +5,9 @@ const express = require("express");
 
 // Import your route handlers
 const authRoutes = require("./routes/authRoutes");
+const roleMiddleware = require("./auth/middleware/roleMiddleware");
+const farmerRoutes = require("./routes/farmerRoutes");
+
 
 // Initialize the Express application
 const app = express();
@@ -21,6 +24,7 @@ app.get("/", (req, res) => {
 // Use the authentication routes
 // All routes defined in authRoutes.js will be prefixed with /api/auth
 app.use("/api/auth", authRoutes);
+app.use("/api/farmer", farmerRoutes);
 
 // Export the app module to be used by server.js
 module.exports = app;
