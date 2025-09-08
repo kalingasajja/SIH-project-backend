@@ -441,7 +441,7 @@ const updateFarmerProfile = async (req, res) => {
 };
 
 module.exports = {
-  registerFarmer,
+ 
   createCollectionEvent,
   getMyBatches,
   getBatchDetails,

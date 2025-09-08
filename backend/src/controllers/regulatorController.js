@@ -562,7 +562,7 @@ const getRegulatorProfile = async (req, res) => {
 };
 
 module.exports = {
-  registerRegulator,
+  
   auditSupplyChain,
   generateComplianceReports,
   investigateIssues,

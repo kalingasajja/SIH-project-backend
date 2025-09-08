@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Import the tester controller functions
 const {
-  registerTester,
+  
   receiveTestSample,
   conductQualityTests,
   generateTestCertificate,
@@ -23,7 +23,7 @@ const authMiddleware = require("../auth/middleware/authMiddleware");
 // @route   POST /api/tester/register
 // @desc    Register a new testing lab in the system
 // @access  Public
-router.post("/register", registerTester);
+
 
 // @route   GET /api/tester/profile
 // @desc    Get tester profile information

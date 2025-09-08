@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Import the farmer controller functions
 const {
-  registerFarmer,
+
   createCollectionEvent,
   getMyBatches,
   getBatchDetails,
@@ -22,7 +22,7 @@ const authMiddleware = require("../auth/middleware/authMiddleware");
 // @route   POST /api/farmer/register
 // @desc    Register a new farmer in the system
 // @access  Public
-router.post("/register", registerFarmer);
+
 
 // @route   GET /api/farmer/profile
 // @desc    Get farmer profile information

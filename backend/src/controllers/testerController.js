@@ -536,7 +536,7 @@ const getTesterProfile = async (req, res) => {
 };
 
 module.exports = {
-  registerTester,
+ 
   receiveTestSample,
   conductQualityTests,
   generateTestCertificate,

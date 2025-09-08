@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Import the regulator controller functions
 const {
-  registerRegulator,
+
   auditSupplyChain,
   generateComplianceReports,
   investigateIssues,
@@ -22,7 +22,7 @@ const authMiddleware = require("../auth/middleware/authMiddleware");
 // @route   POST /api/regulator/register
 // @desc    Register a new regulator in the system
 // @access  Public
-router.post("/register", registerRegulator);
+
 
 // @route   GET /api/regulator/profile
 // @desc    Get regulator profile information

@@ -548,7 +548,7 @@ const generateProcessingCertificate = async (req, res) => {
 };
 
 module.exports = {
-  registerManufacturer,
+ 
   receiveRawMaterial,
   createProcessingEvent,
   getMyProcessingEvents,

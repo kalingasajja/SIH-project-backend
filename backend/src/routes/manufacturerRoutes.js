@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Import the manufacturer controller functions
 const {
-  registerManufacturer,
+ 
   receiveRawMaterial,
   createProcessingEvent,
   getMyProcessingEvents,
@@ -23,7 +23,7 @@ const authMiddleware = require("../auth/middleware/authMiddleware");
 // @route   POST /api/manufacturer/register
 // @desc    Register a new manufacturer/processor in the system
 // @access  Public
-router.post("/register", registerManufacturer);
+
 
 // @route   GET /api/manufacturer/profile
 // @desc    Get manufacturer profile information
