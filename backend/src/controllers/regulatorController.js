@@ -10,96 +10,9 @@ const { generateToken } = require("../auth/jwt");
 // TODO: Import utility functions when implemented
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
-// In-memory storage for demonstration (replace with database in production)
-let regulators = [];
 let auditReports = [];
 let complianceViolations = [];
 let regulatoryAlerts = [];
-
-/**
- * Register a new regulator in the system
- * @param {object} req - Express request object
- * @param {object} res - Express response object
- */
-const registerRegulator = async (req, res) => {
-  try {
-    const {
-      regulatorName,
-      department,
-      jurisdiction,
-      contactInfo,
-      authorityLevel,
-      username,
-      password
-    } = req.body;
-
-    // Basic validation
-    if (!regulatorName || !department || !jurisdiction || !username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be provided",
-        requiredFields: ["regulatorName", "department", "jurisdiction", "username", "password"]
-      });
-    }
-
-    // Check if regulator already exists
-    const existingRegulator = regulators.find(regulator => 
-      regulator.username === username
-    );
-    
-    if (existingRegulator) {
-      return res.status(400).json({
-        success: false,
-        message: "Regulator with this username already exists"
-      });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Generate regulator ID
-    const regulatorId = `REG_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Create regulator object
-    const newRegulator = {
-      regulatorId,
-      regulatorName,
-      department,
-      jurisdiction,
-      contactInfo,
-      authorityLevel: authorityLevel || "INSPECTOR",
-      username,
-      password: hashedPassword,
-      role: "regulator",
-      registrationDate: new Date().toISOString(),
-      isActive: true
-    };
-
-    // Save regulator
-    regulators.push(newRegulator);
-
-    console.log("Regulator registered successfully:", regulatorId);
-    
-    res.status(201).json({
-      success: true,
-      message: "Regulator registered successfully",
-      data: {
-        regulatorId: newRegulator.regulatorId,
-        regulatorName: newRegulator.regulatorName,
-        department: newRegulator.department
-      }
-    });
-
-  } catch (error) {
-    console.error("Regulator registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error during regulator registration",
-      error: error.message
-    });
-  }
-};
 
 /**
  * Audit supply chain for compliance

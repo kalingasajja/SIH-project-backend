@@ -9,93 +9,10 @@ const { generateToken } = require("../auth/jwt");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
 // In-memory storage for demonstration (replace with database in production)
-let farmers = [];
+
 let collectionEvents = [];
 
-/**
- * Register a new farmer in the system
- * @param {object} req - Express request object
- * @param {object} res - Express response object
- */
-const registerFarmer = async (req, res) => {
-  try {
-    const {
-      farmerName,
-      contactInfo,
-      licenseNumber,
-      farmLocation,
-      certifications,
-      username,
-      password
-    } = req.body;
 
-    // Basic validation
-    if (!farmerName || !contactInfo || !licenseNumber || !username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be provided",
-        requiredFields: ["farmerName", "contactInfo", "licenseNumber", "username", "password"]
-      });
-    }
-
-    // Check if farmer already exists
-    const existingFarmer = farmers.find(farmer => 
-      farmer.username === username || farmer.licenseNumber === licenseNumber
-    );
-    
-    if (existingFarmer) {
-      return res.status(400).json({
-        success: false,
-        message: "Farmer with this username or license number already exists"
-      });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Generate farmer ID
-    const farmerId = `FARM_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Create farmer object
-    const newFarmer = {
-      farmerId,
-      farmerName,
-      contactInfo,
-      licenseNumber,
-      farmLocation: farmLocation || {},
-      certifications: certifications || [],
-      username,
-      password: hashedPassword,
-      role: "farmer",
-      registrationDate: new Date().toISOString(),
-      isActive: true
-    };
-
-    // Save farmer (in production, save to database)
-    farmers.push(newFarmer);
-
-    console.log("Farmer registered successfully:", farmerId);
-    
-    res.status(201).json({
-      success: true,
-      message: "Farmer registered successfully",
-      data: {
-        farmerId: newFarmer.farmerId,
-        farmerName: newFarmer.farmerName,
-        licenseNumber: newFarmer.licenseNumber
-      }
-    });
-
-  } catch (error) {
-    console.error("Farmer registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error during farmer registration",
-      error: error.message
-    });
-  }
-};
 
 /**
  * Create a new collection event (herb collection)

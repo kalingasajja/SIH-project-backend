@@ -12,7 +12,7 @@ const { generateToken } = require("../auth/jwt");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
 // In-memory storage for demonstration (replace with database in production)
-let testers = [];
+
 let qualityTestEvents = [];
 let testSamples = [];
 
@@ -21,87 +21,6 @@ let testSamples = [];
  * @param {object} req - Express request object
  * @param {object} res - Express response object
  */
-const registerTester = async (req, res) => {
-  try {
-    const {
-      labName,
-      nablAccreditation,
-      labLocation,
-      contactInfo,
-      testingCapabilities,
-      certifications,
-      username,
-      password
-    } = req.body;
-
-    // Basic validation
-    if (!labName || !nablAccreditation || !labLocation || !username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be provided",
-        requiredFields: ["labName", "nablAccreditation", "labLocation", "username", "password"]
-      });
-    }
-
-    // Check if tester already exists
-    const existingTester = testers.find(tester => 
-      tester.username === username || tester.nablAccreditation === nablAccreditation
-    );
-    
-    if (existingTester) {
-      return res.status(400).json({
-        success: false,
-        message: "Testing lab with this username or NABL accreditation already exists"
-      });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Generate tester ID
-    const testerId = `TEST_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Create tester object
-    const newTester = {
-      testerId,
-      labName,
-      nablAccreditation,
-      labLocation,
-      contactInfo,
-      testingCapabilities: testingCapabilities || [],
-      certifications: certifications || [],
-      username,
-      password: hashedPassword,
-      role: "tester",
-      registrationDate: new Date().toISOString(),
-      isActive: true
-    };
-
-    // Save tester
-    testers.push(newTester);
-
-    console.log("Testing lab registered successfully:", testerId);
-    
-    res.status(201).json({
-      success: true,
-      message: "Testing lab registered successfully",
-      data: {
-        testerId: newTester.testerId,
-        labName: newTester.labName,
-        nablAccreditation: newTester.nablAccreditation
-      }
-    });
-
-  } catch (error) {
-    console.error("Tester registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error during tester registration",
-      error: error.message
-    });
-  }
-};
 
 /**
  * Receive test sample for quality testing

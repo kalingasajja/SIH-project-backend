@@ -8,97 +8,12 @@ const { generateToken } = require("../auth/jwt");
 // const { generateProcessingCertificate } = require("../utils/certificateGenerator");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
-// In-memory storage for demonstration (replace with database in production)
-let manufacturers = [];
+
 let processingEvents = [];
 let rawMaterialInventory = [];
 
-/**
- * Register a new manufacturer/processor in the system
- * @param {object} req - Express request object
- * @param {object} res - Express response object
- */
-const registerManufacturer = async (req, res) => {
-  try {
-    const {
-      companyName,
-      gmpLicense,
-      facilityLocation,
-      contactInfo,
-      processingCapabilities,
-      certifications,
-      username,
-      password
-    } = req.body;
 
-    // Basic validation
-    if (!companyName || !gmpLicense || !facilityLocation || !username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be provided",
-        requiredFields: ["companyName", "gmpLicense", "facilityLocation", "username", "password"]
-      });
-    }
 
-    // Check if manufacturer already exists
-    const existingManufacturer = manufacturers.find(manufacturer => 
-      manufacturer.username === username || manufacturer.gmpLicense === gmpLicense
-    );
-    
-    if (existingManufacturer) {
-      return res.status(400).json({
-        success: false,
-        message: "Manufacturer with this username or GMP license already exists"
-      });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Generate manufacturer ID
-    const manufacturerId = `MANU_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Create manufacturer object
-    const newManufacturer = {
-      manufacturerId,
-      companyName,
-      gmpLicense,
-      facilityLocation,
-      contactInfo,
-      processingCapabilities: processingCapabilities || [],
-      certifications: certifications || [],
-      username,
-      password: hashedPassword,
-      role: "manufacturer",
-      registrationDate: new Date().toISOString(),
-      isActive: true
-    };
-
-    // Save manufacturer
-    manufacturers.push(newManufacturer);
-
-    console.log("Manufacturer registered successfully:", manufacturerId);
-    
-    res.status(201).json({
-      success: true,
-      message: "Manufacturer registered successfully",
-      data: {
-        manufacturerId: newManufacturer.manufacturerId,
-        companyName: newManufacturer.companyName,
-        gmpLicense: newManufacturer.gmpLicense
-      }
-    });
-
-  } catch (error) {
-    console.error("Manufacturer registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error during manufacturer registration",
-      error: error.message
-    });
-  }
-};
 
 /**
  * Receive raw material batch for processing
