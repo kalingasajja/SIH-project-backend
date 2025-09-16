@@ -10,6 +10,7 @@ const { generateToken } = require("../auth/jwt");
 // TODO: Import utility functions when implemented
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
+const { regulators } = require("../data/store");
 let auditReports = [];
 let complianceViolations = [];
 let regulatoryAlerts = [];

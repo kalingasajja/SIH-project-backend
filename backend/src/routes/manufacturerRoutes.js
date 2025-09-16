@@ -3,7 +3,6 @@ const router = express.Router();
 
 // Import the manufacturer controller functions
 const {
- 
   receiveRawMaterial,
   createProcessingEvent,
   getMyProcessingEvents,

@@ -12,7 +12,7 @@ const { generateToken } = require("../auth/jwt");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
 // In-memory storage for demonstration (replace with database in production)
-
+const { testers } = require("../data/store");
 let qualityTestEvents = [];
 let testSamples = [];
 

@@ -9,7 +9,7 @@ const { generateToken } = require("../auth/jwt");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
 // In-memory storage for demonstration (replace with database in production)
-
+const { farmers } = require("../data/store");
 let collectionEvents = [];
 
 

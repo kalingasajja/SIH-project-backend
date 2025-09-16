@@ -2,7 +2,9 @@
 const bcrypt = require("bcryptjs");
 // Import the JWT generation function
 const { generateToken } = require("../auth/jwt");
-const { generateUserKeys } = require("../utils/keyManager");
+// Key management removed for initial implementation
+// const { generateUserKeys } = require("../utils/keyManager");
+const { farmers, manufacturers, testers, regulators } = require("../data/store");
 
 // In-memory user store for demonstration purposes.
 // In a real application, you would use a database.
@@ -135,16 +137,6 @@ const completeRegistration = async (req, res) => {
     // Generate final user ID
     const finalUserId = `${role.toUpperCase()}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // Generate cryptographic keys for the user
-    const keyGenerationResult = generateUserKeys(finalUserId, role, true); // true for demo keys
-    if (!keyGenerationResult.success) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to generate cryptographic keys",
-        error: keyGenerationResult.error
-      });
-    }
-
     // Create complete user object
     const completeUser = {
       id: finalUserId,
@@ -157,11 +149,45 @@ const completeRegistration = async (req, res) => {
       isVerified: false, // Needs verification
       createdAt: new Date().toISOString(),
       verifiedAt: null,
-      // Cryptographic keys (public key stored on server, private key sent to client)
-      publicKey: keyGenerationResult.keyPair.publicKey,
-      keyId: keyGenerationResult.keyPair.keyId,
-      keyMetadata: keyGenerationResult.metadata
+      // Keys removed in initial implementation
     };
+
+    // Also add to role-specific in-memory stores for controllers
+    if (role === 'farmer') {
+      farmers.push({
+        farmerId: finalUserId,
+        farmerName: roleSpecificData.farmerName,
+        contactInfo: roleSpecificData.contactInfo,
+        licenseNumber: roleSpecificData.licenseNumber,
+        farmLocation: roleSpecificData.farmLocation,
+        role: 'farmer'
+      });
+    } else if (role === 'manufacturer') {
+      manufacturers.push({
+        manufacturerId: finalUserId,
+        companyName: roleSpecificData.companyName,
+        gmpLicense: roleSpecificData.gmpLicense,
+        facilityLocation: roleSpecificData.facilityLocation,
+        role: 'manufacturer'
+      });
+    } else if (role === 'tester') {
+      testers.push({
+        testerId: finalUserId,
+        labName: roleSpecificData.labName,
+        nablAccreditation: roleSpecificData.nablAccreditation,
+        labLocation: roleSpecificData.labLocation,
+        role: 'tester'
+      });
+    } else if (role === 'regulator') {
+      regulators.push({
+        regulatorId: finalUserId,
+        regulatorName: roleSpecificData.regulatorName,
+        department: roleSpecificData.department,
+        jurisdiction: roleSpecificData.jurisdiction,
+        authorityLevel: roleSpecificData.authorityLevel || 'STATE',
+        role: 'regulator'
+      });
+    }
 
     // Move from pending to complete users
     users.push(completeUser);
@@ -189,11 +215,7 @@ const completeRegistration = async (req, res) => {
       isComplete: true,
       isVerified: false,
       userId: finalUserId,
-      nextStep: "Account verification pending",
-      // Send private key to client (store securely on client side)
-      privateKey: keyGenerationResult.keyPair.privateKey,
-      keyId: keyGenerationResult.keyPair.keyId,
-      securityNote: "Store your private key securely. It will be used to sign all transactions."
+      nextStep: "Account verification pending"
     });
   } catch (error) {
     console.error("Complete Registration Error:", error);

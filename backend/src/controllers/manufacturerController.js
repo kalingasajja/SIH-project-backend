@@ -8,7 +8,7 @@ const { generateToken } = require("../auth/jwt");
 // const { generateProcessingCertificate } = require("../utils/certificateGenerator");
 // const { formatSuccessResponse, formatErrorResponse } = require("../utils/responseFormatter");
 
-
+const { manufacturers } = require("../data/store");
 let processingEvents = [];
 let rawMaterialInventory = [];
 

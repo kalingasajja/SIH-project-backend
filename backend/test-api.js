@@ -146,11 +146,14 @@ async function testCompleteRegistration() {
     if (result.success) {
       console.log(`   ✅ ${role} complete registration successful`);
       authTokens[role] = result.data.token; // Update with new token
-      userKeys[role] = {
-        privateKey: result.data.privateKey,
-        keyId: result.data.keyId
-      };
-      console.log(`   🔑 Keys generated: ${result.data.keyId}`);
+      // Keys are not used in in-memory mode; only set if present
+      if (result.data.privateKey && result.data.keyId) {
+        userKeys[role] = {
+          privateKey: result.data.privateKey,
+          keyId: result.data.keyId
+        };
+        console.log(`   🔑 Keys generated: ${result.data.keyId}`);
+      }
     } else {
       console.log(`   ❌ ${role} complete registration failed`);
       console.log(`      Error: ${result.error.message}`);
@@ -303,7 +306,7 @@ async function testKeyManagement() {
   console.log('\n🔑 Testing Key Management...');
   
   for (const [role, keys] of Object.entries(userKeys)) {
-    if (!keys) {
+    if (!keys || !keys.privateKey || !keys.keyId) {
       console.log(`   ⚠️  No keys available for ${role}`);
       continue;
     }

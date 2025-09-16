@@ -3,7 +3,6 @@ const router = express.Router();
 
 // Import the farmer controller functions
 const {
-
   createCollectionEvent,
   getMyBatches,
   getBatchDetails,

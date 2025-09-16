@@ -3,7 +3,6 @@ const router = express.Router();
 
 // Import the tester controller functions
 const {
-  
   receiveTestSample,
   conductQualityTests,
   generateTestCertificate,

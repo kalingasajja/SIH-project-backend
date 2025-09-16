@@ -6,8 +6,8 @@ This document outlines the current implementation status of the Hyperledger Fabr
 ## ✅ Completed Components
 
 ### 1. Utility Functions
-- **`geoValidator.js`** - GPS coordinate validation, location verification, and geographic calculations
-- **`qrGenerator.js`** - QR code generation and validation for batches, products, and consumer verification
+- **`geoValidator.js`** -      GPS coordinate validation, location verification, and geographic calculations
+- **`qrGenerator.js`** -       QR code generation and validation for batches, products, and consumer verification
 - **`responseFormatter.js`** - Standardized API response formatting across the application
 
 ### 2. Blockchain Integration
@@ -71,6 +71,12 @@ This document outlines the current implementation status of the Hyperledger Fabr
 - Currently using mock data for demonstration
 - Blockchain interface ready for Hyperledger Fabric integration
 - Need to uncomment blockchain calls in controllers
+
+### Temporary In-Memory Workflow (No Keys, No Blockchain)
+- Authentication and 2-step registration are required for roles: farmer, manufacturer, tester, regulator
+- Events are stored in memory inside controllers for quick testing
+- Custody is tracked in memory with unsigned transactions
+- When Fabric/MongoDB are ready, storage/signing can be swapped without changing routes
 
 ## ⏳ Pending Implementation
 
@@ -228,3 +234,101 @@ The server will be available at `http://localhost:3000`
 **Status**: Core backend implementation complete, ready for blockchain integration and frontend development.
 
 **Last Updated**: December 2024
+
+---
+
+## In-Memory API Reference
+
+### Authentication
+- POST `/api/auth/register`
+  - body: `{ email, password, role: "farmer|manufacturer|tester|regulator" }`
+  - returns: `{ token }`
+- POST `/api/auth/complete-registration` (JWT required)
+  - body depends on role:
+    - farmer: `{ farmerName, contactInfo, licenseNumber, farmLocation }`
+    - manufacturer: `{ companyName, gmpLicense, facilityLocation }`
+    - tester: `{ labName, nablAccreditation, labLocation }`
+    - regulator: `{ regulatorName, department, jurisdiction }`
+  - returns: `{ token, userId, isComplete: true }`
+- POST `/api/auth/login` `{ email, password }` → `{ token }`
+- GET `/api/auth/registration-status` (JWT)
+
+### Farmer Routes (JWT)
+- GET `/api/farmer/profile`
+- PUT `/api/farmer/profile`
+- POST `/api/farmer/collection-event`
+  - required: `gpsTaggedLocation{ latitude, longitude }, speciesIdentity{ botanicalName, commonName, partUsed }, initialQualityMetrics{ ... }`
+  - optional: `certifications[], images[], weatherConditions, harvestMethod`
+  - returns: `{ batchId, eventType: "COLLECTION" }`
+- GET `/api/farmer/batches?page&limit`
+- GET `/api/farmer/batches/:batchId`
+- PUT `/api/farmer/batches/:batchId` (updates: `images`, `certifications`, `initialQualityMetrics`)
+
+### Manufacturer Routes (JWT)
+- GET `/api/manufacturer/profile`
+- POST `/api/manufacturer/receive-material`
+  - required: `{ batchId, receivedQuantity, receivedCondition }`
+  - optional: `{ supplierInfo, qualityInspection, storageLocation }`
+  - returns: `{ receiptId, status: "RECEIVED" }`
+- POST `/api/manufacturer/processing-event`
+  - required: `{ batchId, processingDetails{ processingMethod }, ... }`
+  - optional: `{ qualityParameters, packagingDetails, outputBatches }`
+  - auto: calculates `yieldPercentage`
+  - returns: `{ processingId, eventType: "PROCESSING" }`
+- GET `/api/manufacturer/processing-events?page&limit`
+- GET `/api/manufacturer/processing-events/:processingId`
+- PUT `/api/manufacturer/processing-events/:processingId` (updates: `qualityParameters`, `packagingDetails`, `outputBatches`)
+- GET `/api/manufacturer/inventory?status&page&limit`
+- POST `/api/manufacturer/processing-events/:processingId/certificate`
+
+### Tester Routes (JWT)
+- GET `/api/tester/profile`
+- POST `/api/tester/receive-sample`
+  - required: `{ batchId, sampleQuantity, testRequirements }`
+  - optional: `{ sampleCondition, expectedTests, senderInfo }`
+  - returns: `{ sampleId, status: "RECEIVED" }`
+- POST `/api/tester/conduct-test/:sampleId`
+  - required: `{ testResults, testParameters }`
+  - optional: `{ testMethods, equipmentUsed, testDuration, qualityStandards }`
+  - returns: `{ testId, eventType: "QUALITY_TEST" }`
+- PUT `/api/tester/test-results/:testId`
+- POST `/api/tester/test-certificate/:testId`
+- GET `/api/tester/validate-accreditation/:nablNumber`
+- GET `/api/tester/test-samples?Page&limit`
+- GET `/api/tester/quality-tests?Page&limit`
+
+### Regulator Routes (JWT)
+- GET `/api/regulator/profile`
+- POST `/api/regulator/audit-supply-chain`
+- POST `/api/regulator/compliance-reports`
+- POST `/api/regulator/investigate-issues`
+- POST `/api/regulator/validate-certifications`
+- POST `/api/regulator/monitor-quality-standards`
+- GET `/api/regulator/audit-reports?Page&limit`
+
+### Customer (Public)
+- POST `/api/customer/scan-qr` `{ qrData: stringified JSON }`
+- GET `/api/customer/product-history/:batchId`
+- POST `/api/customer/verify-authenticity`
+- POST `/api/customer/report-issue`
+
+### Custody (In-Memory, No Keys) (JWT)
+- POST `/api/custody/initial` `{ batchId }` → creates initial active custody
+- POST `/api/custody/initiate` `{ toUserId, batchId, transferData? }` → creates pending transfer
+- POST `/api/custody/accept/:transferId`
+- POST `/api/custody/reject/:transferId` `{ reason }`
+- GET `/api/custody/history/:batchId`
+- GET `/api/custody/verify/:batchId`
+
+### Workflow (Temporary)
+1. Register + complete registration (role-specific)
+2. Farmer creates COLLECTION event → gets `batchId`
+3. Optionally create initial custody for `batchId`
+4. Manufacturer receives material → creates PROCESSING event
+5. Tester receives sample → conducts QUALITY_TEST
+6. Regulator can audit/validate at any time
+7. Customer uses public endpoints to verify history
+
+Notes:
+- All data is kept in-memory for development; restarting the server clears it
+- No public/private keys are used in this mode; transactions are unsigned

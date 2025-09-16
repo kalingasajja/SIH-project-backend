@@ -3,7 +3,27 @@
  * Handles custody transfers and prevents fake transactions
  */
 
-const { validateTransaction, createSignedTransaction } = require('./keyManager');
+// Key management removed for initial implementation.
+// Lightweight helpers to create unsigned transactions when keys are unavailable.
+const createUnsignedTransaction = (userId, eventType, eventData) => {
+  const transactionId = `TXN_${eventType}_${userId}_${Date.now()}_${Math.random()
+    .toString(36)
+    .substr(2, 6)
+    .toUpperCase()}`;
+  return {
+    success: true,
+    transactionId,
+    transaction: {
+      transactionId,
+      userId,
+      eventType,
+      eventData,
+      timestamp: new Date().toISOString(),
+      status: 'PENDING',
+      signature: null // no signature in simplified mode
+    }
+  };
+};
 
 // In-memory storage for custody records (replace with database in production)
 let custodyRecords = [];
@@ -21,11 +41,11 @@ let transferHistory = [];
 const initiateCustodyTransfer = async (fromUserId, toUserId, batchId, fromPrivateKey, transferData = {}) => {
   try {
     // Validate required parameters
-    if (!fromUserId || !toUserId || !batchId || !fromPrivateKey) {
+    if (!fromUserId || !toUserId || !batchId) {
       return {
         success: false,
         error: 'Missing required parameters for custody transfer',
-        required: ['fromUserId', 'toUserId', 'batchId', 'fromPrivateKey']
+        required: ['fromUserId', 'toUserId', 'batchId']
       };
     }
 
@@ -56,10 +76,9 @@ const initiateCustodyTransfer = async (fromUserId, toUserId, batchId, fromPrivat
       timestamp: new Date().toISOString()
     };
 
-    // Create signed transaction
-    const transactionResult = createSignedTransaction(
+    // Create transaction (unsigned if no private key)
+    const transactionResult = createUnsignedTransaction(
       fromUserId,
-      fromPrivateKey,
       'CUSTODY_TRANSFER',
       transferEventData
     );
@@ -157,10 +176,9 @@ const acceptCustodyTransfer = async (transferId, toUserId, toPrivateKey, accepta
       location: acceptanceData.location || null
     };
 
-    // Create signed acceptance transaction
-    const acceptanceTransaction = createSignedTransaction(
+    // Create acceptance transaction (unsigned if no keys)
+    const acceptanceTransaction = createUnsignedTransaction(
       toUserId,
-      toPrivateKey,
       'CUSTODY_ACCEPTANCE',
       acceptanceEventData
     );
@@ -409,10 +427,9 @@ const createInitialCustody = async (batchId, initialCustodian, privateKey, custo
       timestamp: new Date().toISOString()
     };
 
-    // Create signed transaction
-    const transactionResult = createSignedTransaction(
+    // Create transaction (unsigned if no keys)
+    const transactionResult = createUnsignedTransaction(
       initialCustodian,
-      privateKey,
       'INITIAL_CUSTODY',
       custodyEventData
     );

@@ -3,7 +3,6 @@ const router = express.Router();
 
 // Import the regulator controller functions
 const {
-
   auditSupplyChain,
   generateComplianceReports,
   investigateIssues,
