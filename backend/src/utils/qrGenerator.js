@@ -6,6 +6,7 @@
 const crypto = require('crypto');
 
 /**
+ * these are used to generate qr codes
  * Generate QR code data for a batch
  * @param {string} batchId - Unique batch identifier
  * @param {object} batchData - Additional batch information
