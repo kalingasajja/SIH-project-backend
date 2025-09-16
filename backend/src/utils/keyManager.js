@@ -1,7 +1,9 @@
 /**
  * Key Management Utilities for Blockchain Transactions
  * Handles key generation, storage, and transaction signing
+ * This is used to manage keys 
  */
+
 
 const crypto = require('crypto');
 const { generateKeyPairSync } = require('crypto');
@@ -327,3 +329,8 @@ module.exports = {
   validateTransaction,
   generateUserKeys
 };
+
+
+const hello = ()=> {
+  console.log("Hello World");
+}
