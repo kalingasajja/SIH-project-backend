@@ -57,4 +57,42 @@ router.get("/profile", authMiddleware, (req, res) => {
   });
 });
 
+// @route   GET api/auth/debug
+// @desc    Debug endpoint to see current system state
+// @access  Public (for debugging)
+router.get("/debug", (req, res) => {
+  const { users, pendingRegistrations, farmers, manufacturers, testers, regulators } = require("../data/store");
+  
+  res.status(200).json({
+    success: true,
+    message: "Debug information",
+    data: {
+      totalUsers: users.length,
+      pendingRegistrations: pendingRegistrations.length,
+      farmers: farmers.length,
+      manufacturers: manufacturers.length,
+      testers: testers.length,
+      regulators: regulators.length,
+      users: users.map(u => ({ id: u.id, email: u.email, role: u.role, isComplete: u.isComplete })),
+      pending: pendingRegistrations.map(p => ({ tempUserId: p.tempUserId, email: p.email, role: p.role }))
+    }
+  });
+});
+
+// @route   GET api/auth/debug-compat
+// @desc    Debug endpoint to see compatibility events
+// @access  Public (for debugging)
+router.get("/debug-compat", (req, res) => {
+  const compatController = require("../controllers/compatController");
+  
+  res.status(200).json({
+    success: true,
+    message: "Compatibility events debug information",
+    data: {
+      // This will show the compatStore from the controller
+      note: "Check server console for detailed logs of received events"
+    }
+  });
+});
+
 module.exports = router;

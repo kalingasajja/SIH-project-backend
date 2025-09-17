@@ -4,12 +4,7 @@ const bcrypt = require("bcryptjs");
 const { generateToken } = require("../auth/jwt");
 // Key management removed for initial implementation
 // const { generateUserKeys } = require("../utils/keyManager");
-const { farmers, manufacturers, testers, regulators } = require("../data/store");
-
-// In-memory user store for demonstration purposes.
-// In a real application, you would use a database.
-const users = [];
-const pendingRegistrations = []; // Store incomplete registrations
+const { users, pendingRegistrations, farmers, manufacturers, testers, regulators } = require("../data/store");
 
 /**
  * Step 1: Initial user registration (email, password, role)

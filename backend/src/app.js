@@ -11,6 +11,7 @@ const testerRoutes = require("./routes/testerRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const regulatorRoutes = require("./routes/regulatorRoutes");
 const custodyRoutes = require("./routes/custodyRoutes");
+const compatRoutes = require("./routes/compatRoutes");
 
 
 // Initialize the Express application
@@ -19,6 +20,16 @@ const app = express();
 // Middleware to parse incoming JSON requests
 // This is crucial for getting data from req.body
 app.use(express.json());
+
+// Minimal CORS to allow frontend on a different port (e.g., 3000)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
 // Define a simple root route for testing if the server is up
 app.get("/", (req, res) => {
@@ -34,6 +45,7 @@ app.use("/api/tester", testerRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/regulator", regulatorRoutes);
 app.use("/api/custody", custodyRoutes);
+app.use("/api", compatRoutes);
 
 // Export the app module to be used by server.js
 module.exports = app;
