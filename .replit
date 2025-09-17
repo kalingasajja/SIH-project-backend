@@ -55,6 +55,6 @@ localPort = 5000
 externalPort = 80
 
 [deployment]
-deploymentTarget = "autoscale"
+deploymentTarget = "vm"
 run = ["bash", "-c", "cd backend && npm start & cd frontend/supply-chain-system && npm start"]
-build = ["bash", "-c", "cd frontend/supply-chain-system && npm run build"]
+build = ["bash", "-c", "cd frontend/supply-chain-system && npm ci && npm run build"]
