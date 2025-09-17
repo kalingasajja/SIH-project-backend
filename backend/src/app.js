@@ -21,12 +21,28 @@ const app = express();
 // This is crucial for getting data from req.body
 app.use(express.json());
 
-// Minimal CORS to allow frontend on a different port (e.g., 3000)
+// CORS configuration with explicit allowed origins for security
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  const allowedOrigins = [
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'https://localhost:5000',
+    'https://localhost:3000',
+    process.env.FRONTEND_URL,
+    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+    process.env.RAILWAY_STATIC_URL,
+    process.env.HEROKU_APP_NAME && `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
+  ].filter(Boolean);
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
+  
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
+  
   if (req.method === "OPTIONS") return res.sendStatus(204);
   next();
 });

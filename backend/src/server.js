@@ -16,11 +16,11 @@ async function initializeBlockchain() {
 }
 
 // Start the server and listen for connections on the specified port
-app.listen(PORT, 'localhost', async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(
     `Server is running in ${
       process.env.NODE_ENV || "development"
-    } mode on localhost:${PORT}`
+    } mode on 0.0.0.0:${PORT}`
   );
   
   // Initialize blockchain mapper

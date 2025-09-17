@@ -10,15 +10,13 @@ const nextConfig = {
     unoptimized: true,
   },
   async rewrites() {
-    if (process.env.NODE_ENV !== 'production') {
-      return [
-        {
-          source: '/api/:path*',
-          destination: 'http://localhost:3001/api/:path*'
-        }
-      ]
-    }
-    return []
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    return [
+      {
+        source: '/backend/:path*',
+        destination: `${backendUrl}/:path*`
+      }
+    ]
   }
 }
 
