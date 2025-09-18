@@ -116,7 +116,7 @@ app.get("/fullProvenance/:finalProductId", (req, res) => {
 app.get("/ledger", (req, res) => res.json(ledger.getAll()));
 
 
-app.listen(4000, () => {
-    console.log("blockchain API listening on 4000");
-}
-);
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+    console.log(`blockchain API listening on ${PORT}`);
+});

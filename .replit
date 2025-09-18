@@ -22,6 +22,10 @@ args = "Frontend"
 task = "workflow.run"
 args = "Backend"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Blockchain"
+
 [[workflows.workflow]]
 name = "Frontend"
 author = "agent"
@@ -55,6 +59,18 @@ author = 41014071
 task = "workflow.run"
 args = "Project"
 
+[[workflows.workflow]]
+name = "Blockchain"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd blockchain/blockchain_layer && npm run dev"
+waitForPort = 3002
+
 [[ports]]
 localPort = 3001
 externalPort = 3001
@@ -64,8 +80,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 42725
-externalPort = 3000
+localPort = 3002
+externalPort = 3002
 
 [deployment]
 deploymentTarget = "vm"
